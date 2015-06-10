@@ -1,6 +1,6 @@
 package com.grupobbva.tdd;
 
-public class Money {
+public class Money implements Expression {
 
 	protected int amount;
 	protected String currency;
@@ -10,12 +10,17 @@ public class Money {
 		this.currency = currency;
 	}
 
-	public Money plus(Money addend) {
-		return new Money(amount + addend.amount, currency);
+	public Expression plus(Money addend) {
+		return new Sum(this, addend);
 	}
 
 	public Money times(int multiplier) {
 		return new Money(amount * multiplier, currency);
+	}
+
+	public Money reduce(Bank bank, String to) {
+		int rate = bank.rate(currency, to);
+		return new Money(amount / rate, to);
 	}
 
 	public static Money dollar(int amount) {

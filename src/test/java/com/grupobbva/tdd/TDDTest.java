@@ -27,8 +27,48 @@ public class TDDTest {
 
 	@Test
 	public void testSimpleAddition() {
-		Money sum = Money.dollar(5).plus(Money.dollar(5));
-		Assert.assertEquals(Money.dollar(10), sum);
+		Money five = Money.dollar(5);
+		Expression sum = five.plus(five);
+		Bank bank = new Bank();
+		Money reduced = bank.reduce(sum, "USD");
+		Assert.assertEquals(Money.dollar(10), reduced);
+	}
+
+	@Test
+	public void testPlusReturnsSum() {
+		Money five = Money.dollar(5);
+		Expression result = five.plus(five);
+		Sum sum = (Sum) result;
+		Assert.assertEquals(five, sum.augend);
+		Assert.assertEquals(five, sum.addend);
+	}
+
+	@Test
+	public void testReduceSum() {
+		Expression sum = new Sum(Money.dollar(3), Money.dollar(4));
+		Bank bank = new Bank();
+		Money result = bank.reduce(sum, "USD");
+		Assert.assertEquals(Money.dollar(7), result);
+	}
+
+	@Test
+	public void testReduceMoney() {
+		Bank bank = new Bank();
+		Money result = bank.reduce(Money.dollar(1), "USD");
+		Assert.assertEquals(Money.dollar(1), result);
+	}
+
+	@Test
+	public void testReduceMoneyDifferentCurrency() {
+		Bank bank = new Bank();
+		bank.addRate("CHF", "USD", 2);
+		Money result = bank.reduce(Money.franc(2), "USD");
+		Assert.assertEquals(Money.dollar(1), result);
+	}
+
+	@Test
+	public void testIdentityRate() {
+		Assert.assertEquals(1, new Bank().rate("USD", "USD"));
 	}
 
 }
